@@ -1,0 +1,95 @@
+model
+{
+for (i in 1:m)
+{
+	# Poisson likelihood for observed counts
+	y[i]~dpois(mu[i])
+	log(mu[i])<-log(e[i])+alpha+u[i]+v[i]
+	# Relative Risk
+	theta[i]<-exp(alpha+u[i]+v[i])
+	# Posterior probability of RR[i]>1
+	PP[i]<-step(theta[i]-1+eps)
+	# Prior distribution for the uncorrelated heterogeneity
+	v[i]~dnorm(0,tau.v)
+}
+
+eps<-1.0E-6
+
+# CAR prior distribution for spatial correlated heterogeneity
+u[1:m]~car.normal(adj[],weights[],num[],tau.u)
+
+# Weights
+for(k in 1:sumNumNeig)
+{
+	weights[k]<-1
+}
+
+# Improper prior distribution for the mean relative risk in the study region
+alpha~dflat()
+mean<-exp(alpha)
+
+# Hyperprior distributions on inverse variance parameter of random effects
+tau.u~dgamma(0.5,0.0005)
+tau.v~dgamma(0.5,0.0005)
+
+}
+ 
+			
+				
+DATA  
+list(
+m=30,
+y=c(
+
+),
+e=c(
+
+
+),
+num = c(
+
+),
+adj = c(
+
+
+
+30, 9, 3, 
+30, 21, 3, 
+30, 2, 1, 
+20, 19, 12, 7, 
+22, 20, 19, 6, 
+29, 26, 25, 23, 22, 20, 7, 5, 
+29, 20, 14, 12, 6, 4, 
+30, 28, 24, 23, 11, 9, 
+30, 24, 8, 1, 
+26, 24, 18, 
+30, 23, 22, 21, 15, 8, 
+27, 14, 7, 4, 
+22, 19, 15, 
+29, 27, 16, 12, 7, 
+22, 21, 13, 11, 
+29, 27, 17, 14, 
+29, 26, 18, 16, 
+26, 17, 10, 
+22, 20, 13, 5, 4, 
+19, 7, 6, 5, 4, 
+30, 15, 11, 2, 
+23, 19, 15, 13, 11, 6, 5, 
+28, 25, 22, 11, 8, 6, 
+28, 26, 10, 9, 8, 
+28, 26, 23, 6, 
+29, 28, 25, 24, 18, 17, 10, 6, 
+16, 14, 12, 
+26, 25, 24, 23, 8, 
+26, 17, 16, 14, 7, 6, 
+21, 11, 9, 8, 3, 2, 1
+
+
+),
+sumNumNeig=142)
+
+
+INITS 
+list(tau.v=1, tau.u=1,alpha=0,
+u=c(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0),
+v=c(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0))
